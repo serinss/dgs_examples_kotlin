@@ -31,24 +31,43 @@ import java.util.concurrent.CompletableFuture
 class ReviewsDataFetcher(private val reviewsService: ReviewsService) {
 
     /**
-     * This datafetcher will be called to resolve the "reviews" field on a Show.
-     * It's invoked for each individual Show, so if we would load 10 shows, this method gets called 10 times.
-     * To avoid the N+1 problem this datafetcher uses a DataLoader.
-     * Although the DataLoader is called for each individual show ID, it will batch up the actual loading to a single method call to the "load" method in the ReviewsDataLoader.
-     * For this to work correctly, the datafetcher needs to return a CompletableFuture.
+     * 이 datafetcher는 Show의 reviews들을 resolve하기 위해 호출될 것
+     * 각 Show에 대해 호출되므로 Show를 10번 로드하면 이 메서드가 10번 호출된다.
+     * N+1 문제를 피하기 위해 DataLoader를 사용
+     * DataLoader는 각각의 쇼 ID에 대해 호출되지만,
+     * 실제 로딩은 ReviewsDataLoader의 "load" 메서드에 대한 단일 메서드 호출로 일괄 처리된다.
+     * 이 작업이 올바르게 작동하려면, 데이터 수집기에서 CompletableFuture를 반환해야 한다.
      */
     @DgsData(parentType = DgsConstants.SHOW.TYPE_NAME, field = DgsConstants.SHOW.Reviews)
     fun reviews(dfe: DgsDataFetchingEnvironment): CompletableFuture<List<Review>> {
-        //Instead of loading a DataLoader by name, we can use the DgsDataFetchingEnvironment and pass in the DataLoader classname.
+        // 이름으로 DataLoader를 로드하는 대신
+        // DgsDataFetchingEnvironment(=dfe)를 사용하여 DataLoader 클래스 이름을 전달할 수 있다.
         val reviewsDataLoader: DataLoader<Int, List<Review>> = dfe.getDataLoader(ReviewsDataLoader::class.java)
 
-        //Because the reviews field is on Show, the getSource() method will return the Show instance.
+        // reviews 필드가 Show에 있으므로, getSource() 메서드는 Show 인스턴스를 반환합니다.
         val show : Show = dfe.getSource()
 
-        //Load the reviews from the DataLoader. This call is async and will be batched by the DataLoader mechanism.
+        // DataLoader에서 reviews를 로드합니다. 이 호출은 비동기적이며 DataLoader 메커니즘에 의해 일괄 처리됩니다.
         return reviewsDataLoader.load(show.id)
     }
 
+    /**
+     * @DgsData(paraentType = 필드를 포함하는 유형, field = datafetcher가 담당하는 필드)
+     * 필드 : build로 생성된 POJO와 연결되어 있음
+     * 필드의 매개변수가 설정되지 않은 경우, 메서드의 이름이 필드 이름으로 사용된다.
+     *
+     * 만약, Show 전체를 가져오는 것이 아니라, reviews만을 가져오고 싶다면, 별도의 Datafetcher를 만드는 것이 좋다.
+     * 하지만 이 때에 N+1 문제가 발생할 수 있으므로 DataLoader를 사용해야 함을 주의!
+     */
+
+    /**
+     * 여러 개의 @DgsData를 관리하기 위해서 @DgsData.List 활용 가능
+     * @DgsData.List(
+        DgsData(parentType = "Query", field = "movies"),
+        DgsData(parentType = "Query", field = "shows")
+        )
+     * 단, @DgsQuery, @DgsMutation은 단일 메서드에서 여러 번 정의할 수 없다.
+     */
     @DgsMutation
     fun addReview(@InputArgument review: SubmittedReview): List<Review> {
         reviewsService.saveReview(review)
