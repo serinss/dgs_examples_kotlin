@@ -27,11 +27,19 @@ import kotlin.streams.toList
 @DgsDataLoader(name = "reviews")
 class ReviewsDataLoader(val reviewsService: ReviewsService): MappedBatchLoader<Int, List<Review>> {
     /**
-     * This method will be called once, even if multiple datafetchers use the load() method on the DataLoader.
-     * This way reviews can be loaded for all the Shows in a single call instead of per individual Show.
+     * DataLoader -> sub-Query를 호출 할 때 생기는 N+1 문제를 해결(=batch, 한번에 모아서 일괄 처리)
+     * 이 메서드는 여러 datafetcher가 DataLoader에서 load() 메서드를 사용하는 경우에도 한 번 호출됩니다.
+     * 이렇게 하면 개별 Show가 아닌 한 번의 통화로 모든 Show에 대한 리뷰를 로드할 수 있습니다.
+     *
+     * MappedBatchLoader : BatchLoader의 키와 유형에 대한 매개변수화
      */
     override fun load(keys: MutableSet<Int>): CompletionStage<Map<Int, List<Review>>> {
         return CompletableFuture.supplyAsync { reviewsService.reviewsForShows(keys.stream().toList()) }
     }
+    /**
+     * CompletableFuture : 비동기 요청 처리
+     * supplyAsync() : 파라미터로 Supplier 인터페이스를 받음. 비동기 상황에서의 작업을 콜백 함수로 넘기고,
+     *                 작업 수행 여부와 관계 없이 CompletableFuture 객체로 다음 로직을 이어나갈 수 있음
+     */
 
 }

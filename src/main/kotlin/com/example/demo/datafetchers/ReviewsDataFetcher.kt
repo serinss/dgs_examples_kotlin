@@ -41,7 +41,8 @@ class ReviewsDataFetcher(private val reviewsService: ReviewsService) {
     @DgsData(parentType = DgsConstants.SHOW.TYPE_NAME, field = DgsConstants.SHOW.Reviews)
     fun reviews(dfe: DgsDataFetchingEnvironment): CompletableFuture<List<Review>> {
         // 이름으로 DataLoader를 로드하는 대신
-        // DgsDataFetchingEnvironment(=dfe)를 사용하여 DataLoader 클래스 이름을 전달할 수 있다.
+        // DgsDataFetchingEnvironment(=dfe)를 사용하여 DataLoader 클래스 이름을 검색할 수 있다.
+        // 해당 이름은 문자열로 전달
         val reviewsDataLoader: DataLoader<Int, List<Review>> = dfe.getDataLoader(ReviewsDataLoader::class.java)
 
         // reviews 필드가 Show에 있으므로, getSource() 메서드는 Show 인스턴스를 반환합니다.
