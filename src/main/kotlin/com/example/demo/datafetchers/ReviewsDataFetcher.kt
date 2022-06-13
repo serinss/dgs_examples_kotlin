@@ -68,15 +68,32 @@ class ReviewsDataFetcher(private val reviewsService: ReviewsService) {
         )
      * 단, @DgsQuery, @DgsMutation은 단일 메서드에서 여러 번 정의할 수 없다.
      */
+
+
     @DgsMutation
     fun addReview(@InputArgument review: SubmittedReview): List<Review> {
-        reviewsService.saveReview(review)
+        //@InputArgument("input")을 활용하여 더 쉽게 입력할 수 있음
 
+        reviewsService.saveReview(review) //리뷰 삽입
         return reviewsService.reviewsForShow(review.showId)?: emptyList()
     }
+
+    /**
+     * @DgsMutation
+     * : 데이터를 수정할 경우에 사용, 명시적으로 뮤테이션를 통해 전송되어야 한다는 규칙을 정하는 것이 좋다.
+     * ex. createReview, addReview 등등의 CRUD작업
+     *
+     * 뮤테이션은 다중 필드를 포함할 수 있다. 쿼리와의 중요한 차이점은
+     * ** 쿼리 필드는 병렬로 실행되지만 뮤테이션 필드는 하나씩 차례대로 실행된다.
+     */
+
 
     @DgsSubscription
     fun reviewAdded(@InputArgument showId: Int): Publisher<Review> {
         return reviewsService.getReviewsPublisher()
     }
+    /**
+     * @DgsSubscription
+     *
+     */
 }

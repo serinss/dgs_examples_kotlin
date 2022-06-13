@@ -24,8 +24,7 @@ interface ShowsService {
 }
 
 /**
- * This service gives a fixed in-memory collection of Shows.
- * In a more realistic implementation the Shows could be loaded from a datastore.
+ * 이 서비스는 Shows의 고정된 메모리 콜렉션을 제공한다. 실제는 DB에서 로드되어야 함
  */
 @Service
 class BasicShowsService : ShowsService {

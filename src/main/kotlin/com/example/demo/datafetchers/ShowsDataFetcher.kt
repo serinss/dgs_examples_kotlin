@@ -23,16 +23,11 @@ import com.netflix.graphql.dgs.DgsQuery
 import com.netflix.graphql.dgs.InputArgument
 
 import kotlinx.coroutines.coroutineScope
+import org.springframework.beans.factory.annotation.Autowired
 
 @DgsComponent
 class ShowsDataFetcher(private val showsService: ShowsService) {
 
-    /**
-     * This datafetcher resolves the `shows` field on Query.
-     * It uses an @InputArgument to get the titleFilter from the Query if one is defined.
-     * As an implementation detail, it leverages Kotlin Coroutines as an output type.
-     *
-     */
     @DgsQuery
     suspend fun shows(@InputArgument titleFilter : String?): List<Show> = coroutineScope {
         if(titleFilter != null) {

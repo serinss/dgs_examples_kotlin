@@ -5,7 +5,10 @@ type Query {
 type Mutation {
     addReview(review: SubmittedReview): [Review]
     addArtwork(showId: Int!, upload: Upload!): [Image]! @skipcodegen
+    #addRating(title: String, start: Int): Rating
 }
+
+# type Rating { avgStarts: Float }
 
 type Subscription {
     reviewAdded(showId: Int!): Review
@@ -19,6 +22,7 @@ type Show {
     artwork: [Image]
 }
 
+# input type은 항상 Datafetcher에 Map 형태로 입력된다.
 input TitleFormat {
     uppercase: Boolean
 }
