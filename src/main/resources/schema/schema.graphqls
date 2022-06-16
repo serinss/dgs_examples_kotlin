@@ -18,7 +18,7 @@ type Show {
     id: Int!
     title(format: TitleFormat): String!
     releaseYear: Int
-    reviews: [Review]
+    reviews: [Review] #sub-query -> dataLoader 확인
     artwork: [Image]
 }
 

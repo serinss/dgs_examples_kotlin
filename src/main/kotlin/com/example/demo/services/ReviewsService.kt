@@ -41,23 +41,22 @@ interface ReviewsService {
 }
 
 /**
- * This service emulates a data store.
- * For convenience in the demo we just generate Reviews in memory, but imagine this would be backed by for example a database.
- * If this was indeed backed by a database, it would be very important to avoid the N+1 problem, which means we need to use a DataLoader to call this class.
+ * 메모리에서 Reviews만 생성하는 것이지만, 예를 들어 데이터베이스와 같이 백업될 것이라고 상상하십시오.
+ * 만약 이것이 정말로 데이터베이스에 의해 지원된다면, N+1 문제를 피하는 것이 매우 중요할 것입니다.
+ * 즉, 이 클래스를 호출하기 위해서는 DataLoader를 사용해야 합니다.
  */
 @Service
 class DefaultReviewsService(private val showsService: ShowsService): ReviewsService {
     private val logger = LoggerFactory.getLogger(ReviewsService::class.java)
 
     private val reviews = mutableMapOf<Int, MutableList<Review>>()
-    private lateinit var reviewsStream : FluxSink<Review>
+    private lateinit var reviewsStream : FluxSink<Review> //lateinit : 초기화(var의 경우에만 가능)
     private lateinit var reviewsPublisher: ConnectableFlux<Review>
 
     @PostConstruct
     fun createReviews() {
         val faker = Faker()
 
-        //For each show we generate a random set of reviews.
         showsService.shows().forEach { show ->
             val generatedReviews = IntStream.range(0, faker.number().numberBetween(1, 20)).mapToObj {
                 val date =
@@ -76,10 +75,8 @@ class DefaultReviewsService(private val showsService: ShowsService): ReviewsServ
             reviewsStream = emitter
         }
 
-
         reviewsPublisher = publisher.publish()
         reviewsPublisher.connect()
-
     }
 
 

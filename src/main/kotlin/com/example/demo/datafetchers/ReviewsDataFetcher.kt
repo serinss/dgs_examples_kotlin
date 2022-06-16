@@ -88,13 +88,8 @@ class ReviewsDataFetcher(private val reviewsService: ReviewsService) {
      * ** 쿼리 필드는 병렬로 실행되지만 뮤테이션 필드는 하나씩 차례대로 실행된다.
      */
 
-
     @DgsSubscription
     fun reviewAdded(@InputArgument showId: Int): Publisher<Review> {
         return reviewsService.getReviewsPublisher()
     }
-    /**
-     * @DgsSubscription
-     *
-     */
 }
