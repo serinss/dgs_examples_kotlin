@@ -41,5 +41,4 @@ class ReviewsDataLoader(val reviewsService: ReviewsService): MappedBatchLoader<I
      * supplyAsync() : 파라미터로 Supplier 인터페이스를 받음. 비동기 상황에서의 작업을 콜백 함수로 넘기고,
      *                 작업 수행 여부와 관계 없이 CompletableFuture 객체로 다음 로직을 이어나갈 수 있음
      */
-
 }
